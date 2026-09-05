@@ -25,6 +25,13 @@ describe("explicit runtime preparation", () => {
     expect(source).toContain('selection === "npm"');
   });
 
+  it("uses the committed lockfile for deterministic npm preparation", () => {
+    const lock = JSON.parse(readFileSync(resolve(ROOT, "package-lock.json"), "utf8"));
+    expect(lock.lockfileVersion).toBe(3);
+    expect(lock.packages[""]?.name).toBe("context-mode");
+    expect(source).toContain('["ci", "--no-audit", "--no-fund"]');
+  });
+
   it("permits only required native and bundler install scripts under npm", () => {
     const packageJson = JSON.parse(readFileSync(resolve(ROOT, "package.json"), "utf8"));
     expect(packageJson.allowScripts).toEqual({ "better-sqlite3": true, esbuild: true });
