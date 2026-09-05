@@ -89,7 +89,7 @@ function installBuildDependencies(pluginRoot, tempDir) {
     pluginRoot,
     tempDir,
     process.platform === "win32" ? "npm.cmd" : "npm",
-    ["install", "--no-audit", "--no-fund"],
+    ["ci", "--no-audit", "--no-fund"],
   );
 }
 
