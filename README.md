@@ -180,6 +180,13 @@ Gestalt plugin and the adapted context-mode plugin/runtime. `feat` advances the
 minor version, supported fix-oriented commit types advance the patch version,
 and breaking changes advance the major version.
 
+Each GitHub release includes one `gestalt-agents-vX.Y.Z.zip`. The bundle
+contains the repository marketplace metadata, the Gestalt plugin and its full
+skill set, the context-mode plugin and runtime sources, `gestalt-setup.sh`, and
+the user documentation. This keeps the complete installation together while
+retaining per-skill activation and Org Plan's explicit milestone skill loading.
+`SHA256SUMS` covers the release archive.
+
 # 📃 Plan
 
 Each L1 starts unreviewed. After implementation and test gates make it

@@ -78,13 +78,21 @@ synchronize = next(
 commit = next(
     step for step in steps if step.get("name") == "Commit synchronized plugin versions"
 )
+build = next(
+    step for step in steps if step.get("name") == "Build installable release bundle"
+)
 publish = next(
     step for step in steps if step.get("name") == "Tag and atomically publish release"
+)
+github_release = next(
+    step for step in steps if step.get("name") == "Publish GitHub release"
 )
 release_guard = "steps.release.outputs.should_release == 'true'"
 assert synchronize["if"] == release_guard
 assert commit["if"] == release_guard
+assert build["if"] == release_guard
 assert publish["if"] == release_guard
+assert github_release["if"] == release_guard
 assert 'scripts/set-plugin-version.py "$VERSION"' in synchronize["run"]
 for versioned_path in (
     "plugins/gestalt/.codex-plugin/plugin.json",
@@ -100,10 +108,24 @@ assert 'git diff --quiet -- "${release_paths[@]}"' in commit["run"]
 assert 'git add -- "${release_paths[@]}"' in commit["run"]
 assert "context-mode-codex-hardening-4b1348d.sha256" in commit["run"]
 assert 'git commit -m "chore(release): $TAG [skip ci]"' in commit["run"]
+assert build["env"]["TAG"] == "${{ steps.release.outputs.tag }}"
+assert build["run"] == 'scripts/build-release-artifacts.sh "$TAG" dist'
 assert 'git tag "$TAG" HEAD' in publish["run"]
 assert 'git push --atomic origin HEAD:main "refs/tags/$TAG"' in publish["run"]
-assert steps.index(synchronize) < steps.index(commit) < steps.index(publish)
-assert source.count(release_guard) == 3
+assert github_release["env"] == {
+    "GH_TOKEN": "${{ github.token }}",
+    "TAG": "${{ steps.release.outputs.tag }}",
+}
+assert 'gh release create "$TAG" dist/*' in github_release["run"]
+assert "--verify-tag --generate-notes --title \"$TAG\"" in github_release["run"]
+assert (
+    steps.index(synchronize)
+    < steps.index(commit)
+    < steps.index(build)
+    < steps.index(publish)
+    < steps.index(github_release)
+)
+assert source.count(release_guard) == 5
 assert "chore" not in semver["with"]["minorList"]
 assert "chore" not in semver["with"]["patchList"]
 assert "GITHUB_TOKEN pushes do not recursively trigger" in source
