@@ -1,6 +1,6 @@
 {
   "name": "context-mode",
-  "version": "2.6.0",
+  "version": "2.7.0",
   "private": true,
   "type": "module",
   "description": "Codex MCP plugin for sandboxed output analysis, FTS5 search, and session continuity.",
