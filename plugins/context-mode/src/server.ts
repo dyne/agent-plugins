@@ -71,6 +71,7 @@ import { stripJsonComments } from "./util/jsonc.js";
 import { resolveClaudeConfigDir } from "./util/claude-config.js";
 import { resolveProjectDir } from "./util/project-dir.js";
 import { loadDatabase } from "./db-base.js";
+import { probeMcpHandshake, resolveMcpProbeLaunch } from "./util/mcp-handshake.js";
 import { AnalyticsEngine, formatReport, getConversationStats, getContentBytesAllSessions, getConversationWindowStats, getLifetimeStats, getMultiAdapterLifetimeStats, getRealBytesStats, pricePerToken } from "./session/analytics.js";
 const __pkg_dir = dirname(fileURLToPath(import.meta.url));
 const VERSION: string = (() => {
@@ -294,7 +295,7 @@ export const COMPACT_TOOL_DESCRIPTIONS: Record<string, string> = {
   ctx_fetch_and_index: "Fetch URL content and index it for ctx_search. WHEN: docs or pages need later retrieval without raw bytes in context; batch related URLs. It is plain HTTP, not browser rendering. RETURNS: previews and cache/index metadata. EXAMPLE: fetch a framework guide.",
   ctx_batch_execute: "Run related commands, auto-index output, and optionally return query matches in one call. WHEN: gather several commands or large output; use concurrency only for independent I/O. RETURNS: labeled sections and matches, not raw logs. EXAMPLE: inspect git history and query failures.",
   ctx_stats: "Return session context-use statistics: bytes, calls, estimated tokens, and savings ratio.",
-  ctx_doctor: "Run installation diagnostics, including PolyglotExecutor and FTS5 self-checks, and return renderer-safe [OK]/[FAIL]/[WARN] results.",
+  ctx_doctor: "Run installation diagnostics, including a fresh spawned MCP handshake, PolyglotExecutor, and FTS5 self-checks, and return renderer-safe [OK]/[FAIL]/[WARN] results.",
   ctx_upgrade: "Return the platform-appropriate upgrade command. Run it with the native shell and restart the session afterward.",
   ctx_purge: "DESTRUCTIVE: permanently delete indexed data. Requires confirm:true and exactly one session or project scope. Ask when scope is unclear.",
   ctx_insight: "Open the hosted Insight dashboard. For indexed-content questions, use ctx_search instead.",
@@ -4250,6 +4251,21 @@ server.registerTool(
     lines.push(`[OK] Storage sessions: ${sessionStorage.path} (${describeStorageDirectorySource(sessionStorage)})`);
     lines.push(`[OK] Storage content: ${contentStorage.path} (${describeStorageDirectorySource(contentStorage)})`);
     lines.push(`[OK] Storage stats: ${statsStorage.path} (${describeStorageDirectorySource(statsStorage)})`);
+
+    // Fresh-process MCP handshake. This crosses the same stdio initialize
+    // boundary as a newly spawned executor instead of only testing code inside
+    // the already-running server process.
+    {
+      const launch = resolveMcpProbeLaunch(pluginRoot);
+      if (!launch) {
+        lines.push("[FAIL] Spawned MCP handshake: FAIL — no MCP launcher or server bundle found");
+      } else {
+        const result = await probeMcpHandshake(launch);
+        const prefix = result.ok ? "[OK]" : "[FAIL]";
+        const status = result.ok ? "PASS" : "FAIL";
+        lines.push(`${prefix} Spawned MCP handshake: ${status} — ${result.detail}`);
+      }
+    }
 
     // Server test — cleanup executor to prevent resource leaks (#247)
     {

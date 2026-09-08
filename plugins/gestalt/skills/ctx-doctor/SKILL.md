@@ -1,6 +1,6 @@
 ---
 name: ctx-doctor
-description: Diagnose context-mode runtime, dependency, hook, FTS5, plugin registration, version, and startup problems. Trigger when the user invokes ctx-doctor or reports that context-mode is missing, unhealthy, or failing to start.
+description: Diagnose context-mode runtime, dependency, spawned MCP handshake, hook, FTS5, plugin registration, version, and startup problems. Trigger when the user invokes ctx-doctor or reports that context-mode is missing, unhealthy, or failing to start.
 ---
 
 # Context Mode Doctor

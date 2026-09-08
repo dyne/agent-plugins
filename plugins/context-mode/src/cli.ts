@@ -41,6 +41,7 @@ import {
 } from "./session/db.js";
 import { ContentStore } from "./store.js";
 import { readToolDenyPatterns, evaluateFilePath } from "./security.js";
+import { probeMcpHandshake, resolveMcpProbeLaunch } from "./util/mcp-handshake.js";
 // v1.0.128 — Issue #559 sibling MCP kill helpers (see PR-559-560-FIX-DESIGN.md).
 import { discoverSiblingMcpPids, killSiblingMcpServers } from "./util/sibling-mcp.js";
 // v1.0.119 — Issue #523 Layer 5 heal: post-bump assertion on .claude-plugin/plugin.json
@@ -762,6 +763,25 @@ async function doctor(): Promise<number> {
       color.yellow("Performance: NORMAL") +
         " — Using Node.js (install Bun for 3-5x speed boost)",
     );
+  }
+
+  // Exercise a new MCP child across the initialize boundary used by spawned
+  // executors. The existing server test below only validates PolyglotExecutor.
+  p.log.step("Testing spawned MCP handshake...");
+  {
+    const launch = resolveMcpProbeLaunch(getPluginRoot());
+    if (!launch) {
+      criticalFails++;
+      p.log.error(color.red("Spawned MCP handshake: FAIL") + " — no MCP launcher or server bundle found");
+    } else {
+      const result = await probeMcpHandshake(launch);
+      if (result.ok) {
+        p.log.success(color.green("Spawned MCP handshake: PASS") + ` — ${result.detail}`);
+      } else {
+        criticalFails++;
+        p.log.error(color.red("Spawned MCP handshake: FAIL") + ` — ${result.detail}`);
+      }
+    }
   }
 
   // Language coverage
