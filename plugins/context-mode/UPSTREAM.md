@@ -5,7 +5,7 @@
 - Imported commit: `4b1348d4bba530d26cfc73181a0c2f263923e334`
 - Describe: `v1.0.169-56-g4b1348d`
 - Upstream package version: `1.0.169`
-- Downstream package version: `2.7.1`
+- Downstream package version: `2.8.0`
 - License: Elastic-2.0
 - Import date: 2026-07-22
 
