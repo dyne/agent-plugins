@@ -105,8 +105,11 @@ Supervision is a completion loop:
   next without returning a final report merely because an L2, checkpoint,
   focused test, or progress update completed.
 - After every executor report, inspect the executor's current state. If the L1
-  is partial and the executor stopped or became idle, immediately resume that
-  same executor. If `org-plan next PLAN review` selects a DONE + UNREVIEWED L1,
+  is partial and the executor stopped or became idle, call `followup_task` on
+  that same executor before returning any root response. If the user asks for
+  status, answer briefly and perform that continuation in the same turn; the
+  status reply does not satisfy the supervision action. If `org-plan next PLAN
+  review` selects a DONE + UNREVIEWED L1,
   review it immediately and return ACCEPT or REJECT. Never review an
   ineligible L1. An executor result, a review result, an accepted-L1 report,
   and terminal whole-plan acceptance are distinct boundaries.
