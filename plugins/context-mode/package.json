@@ -19,7 +19,7 @@
     "doctor": "npx tsx src/cli.ts doctor",
     "typecheck": "tsc --noEmit",
     "pretest": "npm run build",
-    "test": "vitest run tests/plugins/codex-manifest.test.ts tests/scripts/configure-codex.test.ts tests/scripts/prepare-runtime.test.ts tests/scripts/runtime-location.test.ts tests/scripts/start-mjs-mcp-boot.test.ts tests/adapters/codex.test.ts tests/adapters/codex-usage.test.ts tests/adapters/codex-invocation-context.test.ts tests/adapters/codex-external-mcp-routing.test.ts tests/hooks/codex-goal-compact.test.ts tests/hooks/codex-sessionstart-rule-capture.test.ts",
+    "test": "vitest run tests/plugins/codex-manifest.test.ts tests/scripts/configure-codex.test.ts tests/scripts/prepare-runtime.test.ts tests/scripts/runtime-location.test.ts tests/scripts/start-mjs-mcp-boot.test.ts tests/adapters/codex.test.ts tests/adapters/codex-usage.test.ts tests/adapters/codex-invocation-context.test.ts tests/adapters/codex-external-mcp-routing.test.ts tests/hooks/codex-goal-compact.test.ts tests/hooks/codex-sessionstart-rule-capture.test.ts tests/util/mcp-handshake.test.ts",
     "test:watch": "vitest",
     "benchmark": "npx tsx tests/benchmark.ts",
     "test:use-cases": "npx tsx tests/use-cases.ts",
