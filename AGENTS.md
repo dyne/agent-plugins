@@ -56,7 +56,10 @@
   checkpoints, tests, and progress updates until the L1 reaches its review
   boundary. After every executor report, inspect the executor's current state.
   If its L1 is partial and the executor stopped or became idle, resume that same
-  executor immediately. Otherwise take the next eligible lifecycle action:
+  executor immediately with `followup_task` before returning any root response.
+  If the user asks for status during partial work, answer briefly and perform
+  that same continuation in the current turn; a status reply never consumes the
+  required supervision action. Otherwise take the next eligible lifecycle action:
   review only a DONE + UNREVIEWED L1, finish an accepted L1, or launch the next
   L1. Never turn a partial report into a final user response or wait for
   progress approval. An accepted L1 may end its current root turn only after

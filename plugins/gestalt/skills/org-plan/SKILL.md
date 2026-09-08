@@ -99,7 +99,9 @@ subagent dedicated to a position uses collaboration-safe task name `l<a>` or
     not one L2. L2 completion, a checkpoint, a passing focused test, or a
     progress report is non-terminal. After every report, the root inspects the
     executor state. If the L1 is partial and the executor stopped or became
-    idle, resume that same executor immediately. Review only DONE + UNREVIEWED
+    idle, call `followup_task` on that same executor before returning any root
+    response. If the user asks for status, answer briefly and perform that
+    continuation in the same turn. Review only DONE + UNREVIEWED
     L1s. After an L1 is ACCEPTED, committed when changed, REVIEWED, and
     projected, one concise root accepted-L1 final may end that root turn; it
     never ends the plan. Continue through every L1 and a later terminal review
